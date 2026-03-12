@@ -35,7 +35,7 @@ jobs:
 
       - name: Override Nx version
         run: |
-          yarn add \
+          pnpm add \
             "nx@^${{ matrix.nx_version }}" \
             "@nx/devkit@^${{ matrix.nx_version }}" \
             "@nx/jest@^${{ matrix.nx_version }}" \
