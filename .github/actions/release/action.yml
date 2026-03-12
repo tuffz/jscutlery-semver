@@ -13,20 +13,16 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Configure npm authentication
+    - name: Verify npm authentication
       shell: bash
       env:
         NPM_TOKEN: ${{ inputs.npm_token }}
-      run: npm config set "//registry.npmjs.org/:_authToken" "${NPM_TOKEN}"
-
-    - name: Verify npm authentication
-      shell: bash
       run: npm whoami --registry https://registry.npmjs.org
 
     - name: Version
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-        NODE_AUTH_TOKEN: ${{ inputs.npm_token }}
+        NPM_TOKEN: ${{ inputs.npm_token }}
       shell: bash
       run: pnpm nx affected --base=last-release --target=version
 
