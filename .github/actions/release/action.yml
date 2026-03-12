@@ -13,13 +13,15 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Verify npm authentication
+    - name: Configure npm authentication
       shell: bash
       env:
-        # setup-node creates an .npmrc with ${NODE_AUTH_TOKEN} placeholder.
-        # Setting NODE_AUTH_TOKEN is the intended way to authenticate.
-        NODE_AUTH_TOKEN: ${{ inputs.npm_token }}
-      run: npm whoami
+        NPM_TOKEN: ${{ inputs.npm_token }}
+      run: npm config set "//registry.npmjs.org/:_authToken" "${NPM_TOKEN}"
+
+    - name: Verify npm authentication
+      shell: bash
+      run: npm whoami --registry https://registry.npmjs.org
 
     - name: Version
       env:
