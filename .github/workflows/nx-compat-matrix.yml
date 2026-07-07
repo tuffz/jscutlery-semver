@@ -18,11 +18,6 @@ jobs:
   compat:
     runs-on: ubuntu-latest
 
-    # Nx 23 support has not landed yet (tracked in a follow-up PR), so it runs
-    # in the matrix for visibility but is allowed to fail until then. Every
-    # other version is a hard requirement.
-    continue-on-error: ${{ matrix.nx == 23 }}
-
     strategy:
       # Never cancel the other versions when one fails: we want the full
       # red/green picture across the range in a single run.
