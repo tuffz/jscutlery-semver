@@ -125,10 +125,19 @@ describe('Nx Release Migration', () => {
       release = readNxJson(tree)!.release;
     }
 
-    it('should configure release.releaseTagPattern', async () => {
+    it('should configure the release tag pattern', async () => {
       await setupSemver();
 
-      expect(release!.releaseTagPattern).toBe(`{projectName}-{version}`);
+      // The generator emits the nested `releaseTag.pattern` on Nx >= 22 and the
+      // flat `releaseTagPattern` on Nx < 22, so assert whichever the installed
+      // Nx produced to stay green across the whole supported range.
+      const { releaseTag, releaseTagPattern } = release as unknown as {
+        releaseTag?: { pattern?: string };
+        releaseTagPattern?: string;
+      };
+      expect(releaseTag?.pattern ?? releaseTagPattern).toBe(
+        `{projectName}-{version}`,
+      );
     });
 
     it('should configure projects', async () => {
