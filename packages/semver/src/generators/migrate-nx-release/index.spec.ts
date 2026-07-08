@@ -140,6 +140,51 @@ describe('Nx Release Migration', () => {
       );
     });
 
+    afterEach(() => jest.restoreAllMocks());
+
+    function mockInstalledNxMajor(version: string) {
+      jest.spyOn(devkit, 'readJsonFile').mockReturnValue({ version } as never);
+    }
+
+    it('emits the flat releaseTagPattern on Nx < 22', async () => {
+      mockInstalledNxMajor('21.0.0');
+
+      await setupSemver();
+
+      const config = release as unknown as {
+        releaseTag?: unknown;
+        releaseTagPattern?: string;
+      };
+      expect(config.releaseTagPattern).toBe(`{projectName}-{version}`);
+      expect(config.releaseTag).toBeUndefined();
+    });
+
+    it('emits the nested releaseTag.pattern without the 0.x adjustment on Nx 22', async () => {
+      mockInstalledNxMajor('22.0.0');
+
+      await setupSemver();
+
+      const config = release as unknown as {
+        releaseTag?: { pattern?: string };
+        version?: { adjustSemverBumpsForZeroMajorVersion?: boolean };
+      };
+      expect(config.releaseTag?.pattern).toBe(`{projectName}-{version}`);
+      expect(
+        config.version?.adjustSemverBumpsForZeroMajorVersion,
+      ).toBeUndefined();
+    });
+
+    it('opts out of adjustSemverBumpsForZeroMajorVersion on Nx >= 23', async () => {
+      mockInstalledNxMajor('23.0.0');
+
+      await setupSemver();
+
+      const version = release!.version as unknown as {
+        adjustSemverBumpsForZeroMajorVersion?: boolean;
+      };
+      expect(version.adjustSemverBumpsForZeroMajorVersion).toBe(false);
+    });
+
     it('should configure projects', async () => {
       await setupSemver();
 
