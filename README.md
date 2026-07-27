@@ -96,6 +96,11 @@ nx run workspace:version [...options]
 | **`--preset`**                 | `string \| object` | `'conventionalcommits'` | customize Conventional Changelog options ([details](https://github.com/jscutlery/semver#customizing-conventional-changelog))                                    |
 | **`--commitParserOptions`**    | `object`           | `undefined`             | customize the commit parserConfig ([details](https://github.com/jscutlery/semver#customizing-the-commit-parser))                                                |
 
+> [!WARNING]
+> `--dryRun` only reaches the tasks you name on the command line. If your `version` target depends on `["^version"]` (the string shorthand shown in [tracking dependencies](https://github.com/jscutlery/semver#tracking-dependencies)), Nx does not forward the flag to those dependency tasks, so they commit and tag for real during what looks like a preview.
+>
+> Every project named on the command line is an initiating task and does receive the flag, so `nx run-many --target version --all --dryRun` previews everything. `nx run my-project:version --dryRun` does not cover that project's dependencies. See [tracking dependencies](https://github.com/jscutlery/semver#tracking-dependencies) for a `dependsOn` form that forwards the flag.
+
 ## Guides
 
 ### Overwrite default configuration
@@ -382,11 +387,18 @@ If you wish to track changes at any depth of your dependency graph, then you sho
 {
   "targetDefaults": {
     "version": {
-      "dependsOn": ["^version"]
+      "dependsOn": [{ "target": "version", "dependencies": true, "params": "forward" }]
     }
   }
 }
 ```
+
+`params: "forward"` is what makes `--dryRun` reach the dependency `version` tasks. The string shorthand `["^version"]` expands to `{ "target": "version", "dependencies": true }` without a `params` key, and `params` defaults to `"ignore"`, so Nx forwards no command line option to the dependency tasks and each of them commits and tags for real during a dry run.
+
+> [!WARNING]
+> `params: "forward"` forwards **all** command line overrides to the dependency tasks, not only `dryRun`. For example, `nx run my-app:version --releaseAs=major` then forces a `major` bump on every dependency as well.
+>
+> The string shorthand `["^version"]` remains valid if you do not want that blanket forwarding. Its cost is the dry run caveat above: only the tasks you name on the command line are previewed, so use `nx run-many --target version --all --dryRun` rather than `nx run my-app:version --dryRun` when you want a safe preview.
 
 This setup will cause a cascade of version increments starting at the deepest changed dependency,
 then continuing up the graph until the indicated project is reached.
