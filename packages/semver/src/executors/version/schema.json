@@ -157,7 +157,7 @@
       ]
     },
     "commitParserOptions": {
-      "description": "The options passed to the commit parser.",
+      "description": "The options passed to the commit parser. The parser's `warn` option is deliberately not declared here: it expects a callback function, which cannot be expressed in JSON configuration.",
       "type": "object",
       "properties": {
         "mergePattern": {
@@ -184,6 +184,34 @@
             "description": "Header correspondence types"
           }
         },
+        "referenceActions": {
+          "description": "Keywords used to reference an issue, EG: closes, fixes. This value is case insensitive.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Issue reference keyword"
+          }
+        },
+        "issuePrefixes": {
+          "description": "The prefixes of an issue. EG: In gh-123 the prefix is gh-.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Issue prefix"
+          }
+        },
+        "issuePrefixesCaseSensitive": {
+          "description": "Used to define if issuePrefixes should be considered case sensitive.",
+          "type": "boolean"
+        },
+        "noteKeywords": {
+          "description": "Keywords for important notes, EG: BREAKING CHANGE. This value is case insensitive.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Note keyword"
+          }
+        },
         "fieldPattern": {
           "description": "Pattern to match other fields.",
           "type": "string"
@@ -192,8 +220,20 @@
           "description": "Pattern to match what this commit reverts.",
           "type": "string"
         },
+        "revertCorrespondence": {
+          "description": "Used to define what capturing group of revertPattern captures what reverted commit field. The order of the array should correspond to the order of revertPattern's capturing group.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Revert correspondence types"
+          }
+        },
         "commentChar": {
           "description": "What commentChar to use. By default it is null, so no comments are stripped. Set to # if you pass the contents of .git/COMMIT_EDITMSG directly.",
+          "type": "string"
+        },
+        "breakingHeaderPattern": {
+          "description": "Pattern to match a breaking change announced in the header, used when the commit body carries no breaking change note.",
           "type": "string"
         }
       },
