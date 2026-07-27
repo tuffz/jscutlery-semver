@@ -26,6 +26,11 @@
       "type": "boolean",
       "default": false
     },
+    "enforceAtomicPush": {
+      "description": "Enforce an atomic push without retrying a non atomic one in case of failure.",
+      "type": "boolean",
+      "default": false
+    },
     "verifyNpmAuth": {
       "description": "Verify npm registry authentication before versioning.",
       "type": "boolean",
